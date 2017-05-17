@@ -1,0 +1,111 @@
+<html>
+    <head class="bg">
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <link href="/css/bootstrap.min.css" rel="stylesheet">
+        <link href="/css/style.css" rel="stylesheet" type="text/css">
+
+        <title>CRUD</title>
+        <body>
+            <div class="bg"></div>
+            <div style="height:1000px;background-color:white">
+            <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+            <script>
+                 var socket = io.connect();
+            </script>
+            <div><h1>Alla Mongodb-tietokannan crud</h1></div>
+                <div class="row">
+                <div class="col-md-2">
+            <h2>LUKU</h2>
+            <form action="/haekanta" method="GET">
+            <input type="submit" class="btn btn-default" value="Hae collectionit" width="100px">
+            <ul class="list-group">
+                    <%- kannat%>
+                    
+            </ul>
+            </form>
+            <form action="/testi" method="POST">
+            Kirjoita valittava collection ja paina valitse
+            <br/>
+            <input type="text" name="valinta" class="form-control">
+            <input type="submit" class="btn btn-default" value="valitse">
+            </form>
+            <h3>Näytä koko tietokanta</h3>
+            
+            <form action="/show"   method="GET">
+            <input type="submit" class="btn btn-default" value="näytä" width="100px">
+            
+                <ul class="list-group">   
+            <%- näytä%>
+                </ul>
+            
+            
+            </form>
+            
+
+                <form action="/close"  method="POST">
+            <input type="submit" class="btn btn-delete" value="sulje">
+            
+            </form> 
+                </div>        
+            <div class="col-md-2">
+            <h2>Hae ID:llä</h2>
+            <form action="/test2"  method="POST">
+
+                <br/><br/>
+                <input type="text" class="form-control" name="haku" placeholder="Syötä ID" size="20">
+                <br/><input type="submit" class="btn btn-default" value="Hae">
+                <br/>
+                </br>
+                    
+                    <table class="table table-striped">
+                        <tr class="success">
+                             <th>Nimi: <%= name %>
+                             <th>ID: <%= id%>
+                             <th>Väri: <%= color%>
+                        </tr>
+                    </table>
+                    
+                
+            
+            </form>
+                
+            </div>
+            
+            <div class="col-md-2">
+            <h2>KIRJOITUS</h2>
+            
+            <form action="/insert"  method="POST">
+            <br/>Nimi: <input type="text" class="form-control" name="name">
+            <br/>ID: <input type="text" class="form-control" name="id">
+            <br/>Väri: <input type="text" class="form-control" name="color">
+            <br/><input type="submit" class="btn btn-default" value="Lisää">
+            </form>
+            </div>
+            <div class="col-md-2">
+            <h2>PÄIVITYS</h2>
+            
+            <form action="/update"  method="POST">
+            <br/>Päivitettävän ID: <input type="text" class="form-control" name="iid">
+            <br/>Uusi nimi:        <input type="text" class="form-control" name="nimi">
+            <br/>Uusi väri:        <input type="text" class="form-control" name="väri">
+            <br/><input type="submit" class="btn btn-default" value="Päivitä">
+            </form>
+            
+            </div>
+            <div class="col-md-2">
+            <h2>POISTO</h2>
+            <br/>
+            
+            <form action="/poisto"  method="POST">
+                Poistettavan ID: <input type="text" class="form-control" name="poisto">
+                <br/><input type="submit" class="btn btn-default" value="Poista">
+            </form>
+            </div>
+            </div>
+            </div>
+        </body>
+    </head>
+</html>
