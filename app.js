@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 var mongodb = require('mongodb');
 var MongoClient = require('mongodb').MongoClient,
     test = require('assert');
-var uri = 'mongodb://192.84.181.206/testibase'
+var uri = 'mongodb://192.84.181.206/'
 var tableify = require('tableify');
 var json2html = require('node-json2html');
 
@@ -17,24 +17,15 @@ app.use('/css/pictures', express.static('pictures'));
 app.use(bodyParser.urlencoded({
     extended: true
 }));
-var db = 'mongodb://192.84.181.206/testibase';
+var db = 'mongodb://192.84.181.206/';
 //var db2 = ('testibase', new Server('localhost', 27017));
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+var tartar = "";
 
 // Connect using MongoClient
-MongoClient.connect(uri, function(err, db) {
-  // Use the admin database for the operation
-  var adminDb = db.admin();
-  // List all the available databases
-  adminDb.listDatabases(function(err, dbs) {
-    test.equal(null, err);
-    test.ok(dbs.databases.length > 0);
-    console.log(dbs);
-    db.close();
-  });
-});
+
 
 
         
@@ -79,7 +70,7 @@ function pallo(pal) {
     return pal === "testi";
 }
 
-console.log(array.find(pallo));
+//console.log(array.find(pallo));
 
 
 app.use(function (req, res, next) {
@@ -91,8 +82,44 @@ app.use(function (req, res, next) {
   res.locals.iid = null
   res.locals.väri = null
   res.locals.nimi = null
+  res.locals.valkan = null
   next()
 })
+
+app.post('/rootkanta', function(req, res) {
+
+    uri = 'mongodb://192.84.181.206/'+req.body.valitsekanta;    
+    db = 'mongodb://192.84.181.206/'+req.body.valitsekanta;
+    tartar = req.body.valitsekanta;
+    console.log(uri); 
+    res.redirect('/');
+});
+
+app.get('/valitsekanta', function(req, res){
+    MongoClient.connect(uri, function(err, db) {
+  // Use the admin database for the operation
+  var adminDb = db.admin();
+  // List all the available databases
+  adminDb.listDatabases(function(err, dbs) {
+    test.equal(null, err);
+    test.ok(dbs.databases.length > 0);
+    console.log(dbs);
+    var arr = [];
+    for(i=0; i<dbs.databases.length; i++){
+        arr.push(dbs.databases[i].name);
+        
+    };
+    console.log(arr);
+    //var transform = {'<>':'li class="list-group-item"','html': lol};
+    
+    // var tulos = json2html.transform(lol, transform);
+   // console.log('tässä tulos', tulos);
+    res.render('index.ejs', {valkan: arr});
+    db.close();
+  });
+  
+});
+});
 
 app.post('/testi', function(req,res){
  MongoClient.connect(uri, function(err, db) {
@@ -130,6 +157,69 @@ app.post('/test2', function(req, res){
     });
 });
 
+
+app.get('/haeCollectionit', function(req,res){
+
+    MongoClient.connect(uri, function(err, db){
+        
+        /*db.collectionNames(function(err, collections){
+            console.log(collections);
+        });
+        */
+        //var collection = db.collection(tartar);
+        
+
+        db.listCollections().toArray(function(err, doc){
+            //var test = doc[0].name;
+            
+            console.log('hou');
+            arr=[];
+            for(i=0; i<doc.length; i++){
+                arr.push(doc[i].name);
+            }
+            console.log('tässä tulee: ', arr);
+            
+            res.render('index.ejs', {kannat: arr});
+        });    
+    });
+ });
+
+
+app.post('/tinsert', function(req, res){
+    
+    MongoClient.connect(uri, function(err, db){
+        var col = db.collection(taulu);
+        col.insert({name: req.body.name, ID: req.body.id, color: req.body.color});
+       
+        res.redirect('/');
+    });
+});
+
+app.post('/tupdate', function(req, res){
+    
+    MongoClient.connect(uri, function(err, db){
+        var col = db.collection(taulu);
+        col.find({"ID": "2"}).toArray(function(err, asd) {
+            console.log('kakkonen', asd);
+        });
+        console.log('tässä taulu', taulu);
+        col.update({"ID": req.body.iid}, {$set:{"name": req.body.nimi, "color": req.body.väri}});
+      
+        res.redirect('/');
+    });
+});
+
+app.post('/tremove', function(req, res){
+    
+    MongoClient.connect(uri, function(err, db){
+        var col = db.collection(taulu);
+        console.log('tässä taulu', taulu);
+        col.remove({"ID": req.body.poisto});
+      
+        res.redirect('/');
+    });
+});
+    
 
 app.post('/vali', function(req,res,next){
 
@@ -189,6 +279,9 @@ app.get('/show', function(req, res){
         res.render('index.ejs', {näytä: tulos});
     });
 });
+
+
+
 
 app.get('/haekanta', function(req, res){
     
